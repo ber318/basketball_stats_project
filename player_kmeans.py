@@ -10,6 +10,7 @@ from sklearn.decomposition import PCA
 
 #print('hello')
 
+
 #reads the file
 scs_stats = pd.read_csv('averages_2018_2020.csv')
 
@@ -30,9 +31,9 @@ plt.show()
 plt.clf()
 
 #setting up and training the kmeans model using the stats
-kmeans_model = KMeans(n_clusters = 4, random_state = 1)
+kmeans_model = KMeans(n_clusters = 6, random_state = 1)
 #good_columns = scs_stats._get_numeric_data().dropna(axis = 1)
-df = pd.DataFrame(scs_stats[['FGA', 'FGM', 'FT%', 'AST', 'REB', 'STL', 'BLK']])
+df = pd.DataFrame(scs_stats[['PPG', 'FGM', 'FT%', 'AST', 'REB', 'STL', 'BLK']])
 good_columns = np.array(df)
 #print(good_columns)
 
@@ -42,7 +43,7 @@ labels = kmeans_model.labels_
 
 
 
-dfprint = pd.DataFrame(scs_stats[['Athlete', 'FGA', 'FGM', 'FT%', 'AST', 'REB', 'STL', 'BLK']])
+dfprint = pd.DataFrame(scs_stats[['Athlete', 'PPG', 'FGM', 'FT%', 'AST', 'REB', 'STL', 'BLK']])
 dfprint['Cluster'] = labels
 dfprint.sort_values('Cluster', inplace = True)
 print(dfprint)
@@ -57,4 +58,33 @@ print(dfprint)
 #players_and_labels_sorted = sorted(players_and_labels, key = lambda x : x[4])
 #for player in players_and_labels_sorted:
 #	print(player)
+
+
+kmeans_model_points_rebounds = KMeans(n_clusters = 2, random_state = 1)
+pr = pd.DataFrame(scs_stats[['PPG', 'REB']])
+pr_columns = np.array(pr)
+
+kmeans_model_points_rebounds.fit(pr_columns)
+pr_labels = kmeans_model_points_rebounds.labels_
+
+prprint = pd.DataFrame(scs_stats[['Athlete', 'PPG', 'REB']])
+prprint['Cluster'] = pr_labels
+prprint.sort_values('Cluster', inplace = True)
+print(prprint)
+
+plt.grid(linestyle = '--')
+
+
+plt.scatter(pr_columns[pr_labels==0, 0], pr_columns[pr_labels==0, 1], s=100, c='red', label ='Cluster 0')
+plt.scatter(pr_columns[pr_labels==1, 0], pr_columns[pr_labels==1, 1], s=100, c='blue', label ='Cluster 1')
+plt.scatter(pr_columns[pr_labels==2, 0], pr_columns[pr_labels==2, 1], s=100, c='green', label ='Cluster 2')
+plt.scatter(pr_columns[pr_labels==3, 0], pr_columns[pr_labels==3, 1], s=100, c='cyan', label ='Cluster 3')
+
+plt.scatter(kmeans_model_points_rebounds.cluster_centers_[:, 0], kmeans_model_points_rebounds.cluster_centers_[:, 1], s=50, c='yellow', label = 'Centroids')
+plt.title('Clusters of Players')
+plt.xlabel('Points Per Game')
+plt.ylabel('Rebounds Per Game')
+plt.legend()
+
+plt.show()
 
